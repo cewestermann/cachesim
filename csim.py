@@ -53,6 +53,11 @@ class CacheSet:
     def __init__(self, B):
         self.cache_line = CacheLine(B)
 
+    def get_cache_line(self, tag):
+        # TODO: Extend when we can have more than one cache line per
+        # cache set.
+        return self.cache_line
+
 def parse_address(address, s, t):
     tag = address[:t]
     index_bits = address[t:s]
@@ -82,11 +87,12 @@ if __name__ == '__main__':
         address_bits = address_space[address]
 
         tag, index_bits, offset_bits = parse_address(address_bits, s, t)
-#        cache_set = cache[index_bits]
-#        cache_line = cache_set.locate_line(tag)
-#        if cache_line:
-#            words.append(cache_line.get_block(offset_bits))
-#        else:
-#            cache_set.replace_lru(address_bits)
+        print(f"tag: {tag}\tindex_bits: {index_bits}\toffset_bits: {offset_bits}")
+        cache_set = cache[index_bits]
+        cache_line = cache_set.get_cache_line(tag)
+        if cache_line:
+            words.append(cache_line.get_block(offset_bits))
+        else:
+            cache_set.replace_line(address_bits)
 #        break
 #
