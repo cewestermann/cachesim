@@ -82,7 +82,6 @@ if __name__ == '__main__':
         address_bits = address_space[address]
 
         tag, index_bits, offset_bits = parse_address(address_bits, s, t)
-        break
 #        cache_set = cache[index_bits]
 #        cache_line = cache_set.locate_line(tag)
 #        if cache_line:
