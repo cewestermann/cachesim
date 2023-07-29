@@ -12,7 +12,11 @@ import itertools
 # E: Number of Cache Lines per Cache Set
 # B: Number of bytes per block
 # m: Word size of the system
-S, E, B, m = (8, 4, 4, 6)
+S, E, B, m = (8, 4, 4, 8)
+
+INDEX_BITS = int(math.log2(S))
+OFFSET_BITS = int(math.log2(B))
+TAG_BITS = m - (INDEX_BITS + OFFSET_BITS)
 
 def tuple2string(tup):
     return ''.join(str(x) for x in tup)
@@ -24,7 +28,7 @@ ADDRESS_SPACE = {address: tuple2string(tup) for address, tup in
 class CacheLine:
     def __init__(self, blocks=None):
         self.blocks = blocks if blocks is not None else []
-        self.tag = self.blocks[0][0] if self.blocks else None
+        self.tag = self.blocks[0][:TAG_BITS] if self.blocks else None
         self.valid = 1 if self.blocks else 0
 
     def __getitem__(self, offset):
@@ -66,11 +70,6 @@ class CacheSet:
 class Cache:
     def __init__(self):
         self.sets = [CacheSet() for _ in range(S)]
-
-        self._s = int(math.log2(S))
-        self._b = int(math.log2(B))
-        self._t = int(m - (self._b + self._s))
-
     def __getitem__(self, bitstring):
         idx = int(bitstring, 2)
         return self.sets[idx]
@@ -91,9 +90,9 @@ class Cache:
             return cache_set.replace_line(address)
 
     def _parse_address(self, address_bits):
-        tag = address_bits[:self._t]
-        index_bits = address_bits[self._t:self._s]
-        offset_bits = address_bits[self._s:]
+        tag = address_bits[:TAG_BITS]
+        index_bits = address_bits[TAG_BITS:TAG_BITS + INDEX_BITS]
+        offset_bits = address_bits[TAG_BITS + INDEX_BITS:]
         return (tag, index_bits, offset_bits)
 
 
