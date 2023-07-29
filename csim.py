@@ -83,6 +83,7 @@ class Cache:
         cache_line = cache_set.match_line(tag)
 
         if cache_line:
+            # TODO: If the cache_line exists, move to front of deque
             return cache_line[offset_bits]
         else:
             return cache_set.replace_line(address)
