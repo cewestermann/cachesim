@@ -32,31 +32,44 @@ class Trace(NamedTuple):
         address, size = split[1].split(',')
         return cls(op, address, size)
 
-
 def read_trace(trace_name):
     with open(f'traces/{trace_name}.trace', 'r') as f:
         return f.read().split('\n')[:-1]
 
 class CacheLine:
-    def __init__(self, B):
+    def __init__(self, blocks=None):
         self.valid = 0
-        self.tag = None
-        self.blocks = []
+        self.blocks = blocks if blocks is not None else []
+        self.tag = self.blocks[0][0] if self.blocks else None
 
     def __contains__(self, tag):
         return self.tag == tag
+
+    def __repr__(self):
+        return (f'CacheLine(valid={self.valid}, ' 
+                        f'tag={self.tag}, blocks={self.blocks})')
 
     def get_block(self, offset):
         return self.blocks[offset]
 
 class CacheSet:
     def __init__(self, B):
-        self.cache_line = CacheLine(B)
+        self.cache_line = CacheLine()
+
+    def __repr__(self):
+        return f'CacheSet({self.cache_line!r})'
 
     def get_cache_line(self, tag):
         # TODO: Extend when we can have more than one cache line per
         # cache set.
-        return self.cache_line
+        if self.cache_line.tag == tag:
+            return self.cache_line
+        return None
+
+    def replace_line(self, address):
+        block1 = address_space[address]
+        block2 = address_space[address + 1]
+        self.cache_line = CacheLine([block1, block2])
 
 def parse_address(address, s, t):
     tag = address[:t]
@@ -91,8 +104,8 @@ if __name__ == '__main__':
         cache_set = cache[index_bits]
         cache_line = cache_set.get_cache_line(tag)
         if cache_line:
-            words.append(cache_line.get_block(offset_bits))
+            words.append(cache_line.get_block(int(offset_bits, 2)))
         else:
-            cache_set.replace_line(address_bits)
-#        break
-#
+            cache_set.replace_line(address)
+        print(cache_set.cache_line)
+        print(cache_set)
