@@ -105,7 +105,6 @@ if __name__ == '__main__':
     cache = Cache()
     
     pprint.pprint(ADDRESS_SPACE)
-    words = []
     for address in read_sequence:
         word = cache(address)
         print(cache)
