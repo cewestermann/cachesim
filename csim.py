@@ -14,28 +14,6 @@ def tuple2bitstring(tup):
 address_space = {address: tuple2bitstring(tup) for address, tup in 
                   enumerate(itertools.product(range(2), repeat=m))}
 
-class Operation(Enum):
-    INSTRUCTION = "I"
-    LOAD = "L"
-    STORE = "S"
-    MODIFY = "M"
-
-class Trace(NamedTuple):
-    operation: Operation
-    address: str
-    size: int
-
-    @classmethod
-    def from_str(cls, str_):
-        split = str_.split()
-        op = Operation(split[0])
-        address, size = split[1].split(',')
-        return cls(op, address, size)
-
-def read_trace(trace_name):
-    with open(f'traces/{trace_name}.trace', 'r') as f:
-        return f.read().split('\n')[:-1]
-
 class CacheLine:
     def __init__(self, blocks=None):
         self.blocks = blocks if blocks is not None else []
