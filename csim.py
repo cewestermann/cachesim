@@ -89,6 +89,11 @@ class Cache:
         return 'Cache(\n\t' + '\n\t'.join(repr(set_) for set_ in self.sets) + '\n)'
 
 if __name__ == '__main__':
+    # S: Number of Cache Sets
+    # E: Number of Cache Lines per Cache Set
+    # B: Number of bytes per block
+    # m: Word size of the system
+
     S, E, B, m = (4, 1, 2, 4)
     s = int(math.log2(S))
     b = int(math.log2(B))
