@@ -38,9 +38,9 @@ def read_trace(trace_name):
 
 class CacheLine:
     def __init__(self, blocks=None):
-        self.valid = 0
         self.blocks = blocks if blocks is not None else []
         self.tag = self.blocks[0][0] if self.blocks else None
+        self.valid = 1 if self.blocks else 0
 
     def __contains__(self, tag):
         return self.tag == tag
@@ -85,6 +85,9 @@ class Cache:
         idx = int(bitstring, 2)
         return self.sets[idx]
 
+    def __repr__(self):
+        return 'Cache(\n\t' + '\n\t'.join(repr(set_) for set_ in self.sets) + '\n)'
+
 if __name__ == '__main__':
     S, E, B, m = (4, 1, 2, 4)
     s = int(math.log2(S))
@@ -105,7 +108,7 @@ if __name__ == '__main__':
         cache_line = cache_set.get_cache_line(tag)
         if cache_line:
             words.append(cache_line.get_block(int(offset_bits, 2)))
+            print('CACHE HIT')
         else:
             cache_set.replace_line(address)
-        print(cache_set.cache_line)
-        print(cache_set)
+            print('CACHE MISS')
