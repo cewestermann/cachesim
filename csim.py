@@ -6,6 +6,11 @@ from collections import deque
 import itertools
 
 # TODO: Add argparse for these parameters
+
+# S: Number of Cache Sets
+# E: Number of Cache Lines per Cache Set
+# B: Number of bytes per block
+# m: Word size of the system
 S, E, B, m = (4, 1, 2, 4)
 
 def tuple2string(tup):
@@ -90,12 +95,6 @@ class Cache:
 
 
 if __name__ == '__main__':
-    # S: Number of Cache Sets
-    # E: Number of Cache Lines per Cache Set
-    # B: Number of bytes per block
-    # m: Word size of the system
-
-
     read_sequence = (0, 1, 13, 8, 0)
 
     cache = Cache()
