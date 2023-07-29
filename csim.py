@@ -5,7 +5,8 @@ from dataclasses import dataclass
 from collections import deque
 import itertools
 
-m = 4 # Address size
+# TODO: Add argparse for these parameters
+S, E, B, m = (4, 1, 2, 4)
 
 def tuple2string(tup):
     return ''.join(str(x) for x in tup)
@@ -31,9 +32,8 @@ class CacheLine:
                         f'tag={self.tag}, blocks={self.blocks})')
 
 class CacheSet:
-    def __init__(self, E, B):
+    def __init__(self):
         self.cache_lines = deque(maxlen=B)
-        self._B = B
 
     def __repr__(self):
         return f'CacheSet({self.cache_lines!r})'
@@ -50,16 +50,15 @@ class CacheSet:
         and returns the first block of the new cache line.
         """
         # TODO: Bounds check
-        blocks = [address_space[address + i] for i in range(self._B)]
+        blocks = [address_space[address + i] for i in range(B)]
         # If full, just append to the right side of the deque
         # which will push out the least recently used (LRU) cache line
         self.cache_lines.append(CacheLine(blocks))
         return blocks[0]
 
-
 class Cache:
-    def __init__(self, S, E, B, m):
-        self.sets = [CacheSet(E, B) for _ in range(S)]
+    def __init__(self):
+        self.sets = [CacheSet() for _ in range(S)]
 
         self._s = int(math.log2(S))
         self._b = int(math.log2(B))
@@ -96,14 +95,10 @@ if __name__ == '__main__':
     # B: Number of bytes per block
     # m: Word size of the system
 
-    S, E, B, m = (4, 1, 2, 4)
-    s = int(math.log2(S))
-    b = int(math.log2(B))
-    t = int(m - (b + s))
 
     read_sequence = (0, 1, 13, 8, 0)
 
-    cache = Cache(S, E, B, m)
+    cache = Cache()
     
     words = []
     for address in read_sequence:
