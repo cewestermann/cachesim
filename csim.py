@@ -3,6 +3,7 @@ import math
 from enum import Enum
 from dataclasses import dataclass
 from collections import deque
+import pprint
 import itertools
 
 # TODO: Add argparse for these parameters
@@ -11,13 +12,13 @@ import itertools
 # E: Number of Cache Lines per Cache Set
 # B: Number of bytes per block
 # m: Word size of the system
-S, E, B, m = (4, 1, 2, 4)
+S, E, B, m = (8, 4, 4, 6)
 
 def tuple2string(tup):
     return ''.join(str(x) for x in tup)
 
 # Emulate our address space
-address_space = {address: tuple2string(tup) for address, tup in 
+ADDRESS_SPACE = {address: tuple2string(tup) for address, tup in 
                   enumerate(itertools.product(range(2), repeat=m))}
 
 class CacheLine:
@@ -55,7 +56,8 @@ class CacheSet:
         and returns the first block of the new cache line.
         """
         # TODO: Bounds check
-        blocks = [address_space[address + i] for i in range(B)]
+
+        blocks = [ADDRESS_SPACE[address + i] for i in range(B)]
         # If full, just append to the right side of the deque
         # which will push out the least recently used (LRU) cache line
         self.cache_lines.append(CacheLine(blocks))
@@ -77,7 +79,7 @@ class Cache:
         return 'Cache(\n\t' + '\n\t'.join(repr(set_) for set_ in self.sets) + '\n)'
 
     def __call__(self, address):
-        address_bits = address_space[address]
+        address_bits = ADDRESS_SPACE[address]
         tag, index_bits, offset_bits = self._parse_address(address_bits)
         cache_set = self[index_bits]
         cache_line = cache_set.match_line(tag)
@@ -100,7 +102,10 @@ if __name__ == '__main__':
 
     cache = Cache()
     
+    pprint.pprint(ADDRESS_SPACE)
     words = []
     for address in read_sequence:
         word = cache(address)
-        print(word)
+        print(cache)
+        print('\n')
+
