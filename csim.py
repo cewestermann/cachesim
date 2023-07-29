@@ -59,10 +59,13 @@ class CacheSet:
         Replaces a cache line using the Least Recently Used (LRU) policy
         and returns the first block of the new cache line.
         """
-        # TODO: Bounds check
+        # Check that address + i does not exceed the address space
+        if address + B > len(ADDRESS_SPACE):
+            blocks = [ADDRESS_SPACE[address + i] for i in range(len(ADDRESS_SPACE) - address)]
+        else:
+            blocks = [ADDRESS_SPACE[address + i] for i in range(B)]
 
-        blocks = [ADDRESS_SPACE[address + i] for i in range(B)]
-        # If full, just append to the right side of the deque
+        # Just append to the right side of the deque
         # which will push out the least recently used (LRU) cache line
         self.cache_lines.append(CacheLine(blocks))
         return blocks[0]
