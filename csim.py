@@ -49,7 +49,11 @@ class CacheSet:
         return f'CacheSet({self.cache_lines!r})'
 
     def _push_to_front(self, idx):
-        self.cache_lines.rotate(-idx)
+        value = self.cache_lines[idx]
+        # remove value at index
+        self.cache_lines.remove(value)
+        # append to the right side of the deque
+        self.cache_lines.append(value)
 
     def match_line(self, tag):
         for idx, line in enumerate(self.cache_lines):
