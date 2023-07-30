@@ -48,9 +48,13 @@ class CacheSet:
     def __repr__(self):
         return f'CacheSet({self.cache_lines!r})'
 
+    def _push_to_front(self, idx):
+        self.cache_lines.rotate(-idx)
+
     def match_line(self, tag):
-        for line in self.cache_lines:
+        for idx, line in enumerate(self.cache_lines):
             if line.tag == tag and line.valid:
+                self._push_to_front(idx)
                 return line
         return None
 
